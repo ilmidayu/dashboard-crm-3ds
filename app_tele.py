@@ -57,7 +57,7 @@ df = load_data()
 # 4. SIDEBAR NAVIGATION & LOGO
 # ==========================================
 with st.sidebar:
-try:
+    try:
         st.image("logo_3ds.png", use_container_width=True)
     except:
         st.warning("⚠️ Gagal memuat logo dari link.")
