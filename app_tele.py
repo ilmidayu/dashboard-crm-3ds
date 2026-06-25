@@ -58,7 +58,7 @@ df = load_data()
 # ==========================================
 with st.sidebar:
 # 👇👇👇 MASUKKAN LINK GAMBARMU DI SINI 👇👇👇
-    link_logo = "https://drive.google.com/file/d/167tpyx1L5G8v_Ujz9wwqnm6T5pxICxzN/view?usp=drive_link"
+    link_logo = "https://drive.google.com/uc?export=view&id=167tpyx1L5G8v_Ujz9wwqnm6T5pxICxzN"
     
     try:
         st.image(link_logo, use_container_width=True)
