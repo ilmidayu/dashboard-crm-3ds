@@ -57,11 +57,8 @@ df = load_data()
 # 4. SIDEBAR NAVIGATION & LOGO
 # ==========================================
 with st.sidebar:
-# 👇👇👇 MASUKKAN LINK GAMBARMU DI SINI 👇👇👇
-    link_logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuj9fvCwc7d8GtnKw4vy11ZKX8BE7jotVulg&s"
-    
-    try:
-        st.image(link_logo, use_container_width=True)
+try:
+        st.image("logo_3ds.png", use_container_width=True)
     except:
         st.warning("⚠️ Gagal memuat logo dari link.")
 
