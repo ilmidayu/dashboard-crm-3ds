@@ -1,9 +1,8 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from pycaret.classification import load_model, predict_model
 import requests
-import time
+import os
 
 # ==========================================
 # 1. SETUP HALAMAN & TEMA (DIGITAL MARKETING)
@@ -12,53 +11,70 @@ st.set_page_config(page_title="CRM & Marketing Analytics PT 3DS", page_icon="�
 
 st.markdown("""
     <style>
-    .stMetric {background-color: #f1f8ff; border-left: 5px solid #0056b3; padding: 15px; border-radius: 5px; box-shadow: 2px 2px 10px rgba(0,0,0,0.05);}
+    .stMetric {
+        background-color: #f1f8ff; 
+        border-left: 5px solid #0056b3; 
+        padding: 15px; 
+        border-radius: 5px; 
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+    }
     </style>
     """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. FUNGSI TELEGRAM (KHUSUS MARKETING ALERT)
+# 2. FUNGSI TELEGRAM (ANTI-GAGAL)
 # ==========================================
 def kirim_telegram(pesan):
-    # 👇👇👇 GANTI DENGAN TOKEN DAN CHAT ID KAMU 👇👇👇 python
+    # 👇👇👇 GANTI DENGAN TOKEN DAN CHAT ID KAMU 👇👇👇
+    BOT_TOKEN = "8793828622:AAF55Kc59SJFzCGlPZKq3uvf3gz3yTy2GTQ" 
+    CHAT_ID = "-5169991149"
     # 👆👆👆 ========================================= 👆👆👆
     
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": CHAT_ID, "text": pesan, "parse_mode": "Markdown"}
+    
+    # parse_mode Markdown dihapus agar aman membaca karakter pada nama PT
+    payload = {"chat_id": CHAT_ID, "text": pesan}
     try:
-        requests.post(url, json=payload)
-    except:
-        pass
+        response = requests.post(url, json=payload)
+        if response.status_code != 200:
+            st.error(f"⚠️ Gagal mengirim ke Telegram: {response.text}")
+            return False
+        return True
+    except Exception as e:
+        st.error(f"⚠️ Error Sistem: {e}")
+        return False
 
 # ==========================================
-# 3. LOAD DATA & MODEL
+# 3. LOAD DATA (TANPA MODEL MACHINE LEARNING)
 # ==========================================
 @st.cache_data
 def load_data():
     return pd.read_csv('dataset_final_clustering.csv')
 
-@st.cache_resource
-def get_model():
-    return load_model('best_classification_model_pycaret')
-
 df = load_data()
-model = get_model()
 
 # ==========================================
-# 4. SIDEBAR NAVIGATION
+# 4. SIDEBAR NAVIGATION & LOGO
 # ==========================================
-st.sidebar.image("https://cdn-icons-png.flaticon.com/512/1998/1998087.png", width=120)
-st.sidebar.title("🎯 Marketing CRM Menu")
-st.sidebar.markdown("---")
-menu = st.sidebar.radio("Pilih Modul:", [
-    "📈 CRM Overview", 
-    "📊 Audience Profiling & Target", 
-    "🚨 Churn & Retargeting Alert", 
-    "🔮 Lead Scoring (AI Prediksi)"
-])
+with st.sidebar:
+# 👇👇👇 MASUKKAN LINK GAMBARMU DI SINI 👇👇👇
+    link_logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuj9fvCwc7d8GtnKw4vy11ZKX8BE7jotVulg&s"
+    
+    try:
+        st.image(link_logo, use_container_width=True)
+    except:
+        st.warning("⚠️ Gagal memuat logo dari link.")
+
+    st.title("🎯 Marketing CRM Menu")
+    st.markdown("---")
+    menu = st.radio("Pilih Modul:", [
+        "📈 CRM Overview", 
+        "📊 Audience Profiling & Target", 
+        "🚨 Churn & Retargeting Alert"
+    ])
 
 # ==========================================
-# MODUL 1: CRM OVERVIEW (Tampilan yang Kamu Suka)
+# MODUL 1: CRM OVERVIEW 
 # ==========================================
 if menu == "📈 CRM Overview":
     st.title("📈 CRM & Sales Overview")
@@ -101,7 +117,7 @@ if menu == "📈 CRM Overview":
         st.dataframe(df)
 
 # ==========================================
-# MODUL 2: AUDIENCE PROFILING & TARGET (Top 5 Pindah ke sini)
+# MODUL 2: AUDIENCE PROFILING & TARGET 
 # ==========================================
 elif menu == "📊 Audience Profiling & Target":
     st.title("📊 Profiling & Target Up-Selling")
@@ -147,56 +163,19 @@ elif menu == "🚨 Churn & Retargeting Alert":
                 top_3_churn = vip_churn_risk.sort_values(by='Monetary', ascending=False).head(3)['Customer'].tolist()
                 nama_pt_str = "\n- ".join(top_3_churn)
                 
-                pesan_marketing = f"""🎯 *MARKETING CAMPAIGN ALERT* 🎯
+                # Teks diubah tanpa format khusus agar aman dikirim ke Telegram
+                pesan_marketing = f"""MARKETING CAMPAIGN ALERT
                 
-⚠️ Terdapat *{len(vip_churn_risk)} Klien VIP* yang belum bertransaksi selama lebih dari {batas_recency} hari.
+Terdapat {len(vip_churn_risk)} Klien VIP yang belum bertransaksi selama lebih dari {batas_recency} hari.
 
-🏢 *Top 3 Prioritas Retargeting:*
+Top 3 Prioritas Retargeting:
 - {nama_pt_str}
 
-📈 *Action Plan:* Mohon tim Digital Marketing segera eksekusi *Email Retargeting Campaign* berisi diskon perpanjangan lisensi / penawaran Training eksklusif untuk daftar perusahaan di atas.
+Action Plan: Mohon tim Digital Marketing segera eksekusi Email Retargeting Campaign berisi diskon perpanjangan lisensi / penawaran eksklusif untuk daftar perusahaan di atas.
 """
-                kirim_telegram(pesan_marketing)
-                st.success("✅ Pesan berhasil dikirim ke Telegram Manajer Digital Marketing!")
-                st.balloons()
+                sukses = kirim_telegram(pesan_marketing)
+                if sukses:
+                    st.success("✅ Pesan berhasil dikirim ke Telegram Manajer Digital Marketing!")
+                    st.balloons()
     else:
         st.success("Kondisi aman! Tidak ada VIP yang berisiko churn pada ambang batas waktu ini.")
-
-# ==========================================
-# MODUL 4: LEAD SCORING (AI PREDIKSI)
-# ==========================================
-elif menu == "🔮 Lead Scoring (AI Prediksi)":
-    st.title("🔮 AI Lead Scoring (New Prospect)")
-    st.markdown("Evaluasi prospek/klien baru (*Leads*) secara otomatis menggunakan Machine Learning. Apakah mereka layak mendapat prioritas *Follow-up*?")
-    
-    with st.form("form_prediksi"):
-        c1, c2 = st.columns(2)
-        with c1:
-            nama_pt = st.text_input("Nama Prospek / Klien", placeholder="PT Target Market")
-            recency = st.number_input("Estimasi Recency", min_value=0, value=10)
-            frequency = st.number_input("Rencana Frekuensi Beli", min_value=1, value=1)
-        with c2:
-            monetary = st.number_input("Estimasi Deal Value (Rp)", min_value=0, value=25000000, step=1000000)
-            skp = st.slider("Ekspektasi Kepuasan (SKP)", 1.0, 5.0, 4.0, 0.1)
-            skl = st.slider("Ekspektasi Layanan (SKL)", 1.0, 5.0, 4.0, 0.1)
-            
-        submit_button = st.form_submit_button(label="🎯 Analisis Potensi Lead")
-
-    if submit_button:
-        input_data = pd.DataFrame({'Recency': [recency], 'Frequency': [frequency], 'Monetary': [monetary], 'SKP': [skp], 'SKL': [skl]})
-        
-        with st.spinner("Mesin Random Forest sedang menilai..."):
-            time.sleep(1)
-            hasil = predict_model(model, data=input_data)
-            pred_label = hasil['prediction_label'][0]
-            
-            st.markdown("---")
-            rata_rata_monetary_sistem = df['Monetary'].mean()
-            
-            if monetary > rata_rata_monetary_sistem: 
-                st.success(f"⭐⭐⭐ **HOT LEAD: {nama_pt} BERPOTENSI MENJADI VIP!** ⭐⭐⭐")
-                st.write("Skor AI menunjukkan klien ini sangat bernilai.")
-                st.write("**Rekomendasi:** Berikan prioritas pada *Sales Pipeline*. Lakukan pendekatan personal (B2B Call) secepatnya.")
-            else:
-                st.info(f"👤 **WARM LEAD: {nama_pt} adalah calon pelanggan standar.**")
-                st.write("**Rekomendasi:** Masukkan ke dalam *Automated Email Nurturing Sequence* standar PT 3DS.")
