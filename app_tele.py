@@ -112,7 +112,6 @@ if filter_tahun != "Semua Tahun":
     df = df[df['Tahun_Terakhir'] == filter_tahun]
 df = df[(df['Segment_Name'].isin(filter_segmen)) & (df['Recency'] <= filter_recency)]
 
-
 # ==========================================
 # MODUL 1: RINGKASAN UTAMA (LAYOUT BARU)
 # ==========================================
