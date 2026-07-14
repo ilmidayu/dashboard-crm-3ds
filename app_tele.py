@@ -125,7 +125,7 @@ if menu == "📊 Ringkasan Utama":
         col3.metric("Rata-rata Transaksi", f"{df['Frequency'].mean():.1f} Kali")
         col4.metric("Rata-rata Kepuasan", f"{df['SKP'].mean():.2f} / 5.0")
 
-    # BARIS 1: Tabel Memanjang Full Width
+# BARIS 1: Tabel Memanjang Full Width
     with st.container(border=True):
         st.markdown("#### Profil Agregat per Segmen")
         tabel_ringkasan = df.groupby('Segment_Name').agg(
@@ -133,8 +133,14 @@ if menu == "📊 Ringkasan Utama":
             Frekuensi_Rata2=('Frequency', 'mean'),
             Total_Belanja=('Monetary', 'sum')
         ).reset_index()
+        
         tabel_ringkasan['Recency_Rata2'] = tabel_ringkasan['Recency_Rata2'].round(1)
         tabel_ringkasan['Frekuensi_Rata2'] = tabel_ringkasan['Frekuensi_Rata2'].round(2)
+        
+        # --- KODE TAMBAHAN UNTUK FORMAT RUPIAH ---
+        tabel_ringkasan['Total_Belanja'] = tabel_ringkasan['Total_Belanja'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))
+        # -----------------------------------------
+        
         st.dataframe(tabel_ringkasan, use_container_width=True)
 
     # BARIS 2: Pie Chart (Kiri) & Scatter Plot (Kanan)
