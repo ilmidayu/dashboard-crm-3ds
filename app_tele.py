@@ -272,10 +272,7 @@ elif menu == "🚨 Warning Pelanggan":
                             if sukses:
                                 st.success("Notifikasi Telegram berhasil terkirim ke HP!")
             else:
-                st.success("Kondisi aman. Tidak ada pelanggan yang memerlukan intervensi mendesak.")
-
-        # --- KODE TAMBAHAN UNTUK FORMAT RUPIAH ---
-        tabel_ringkasan['Total_Belanja'] = tabel_ringkasan['Total_Belanja'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))        
+                st.success("Kondisi aman. Tidak ada pelanggan yang memerlukan intervensi mendesak.")  
         
         with c2:
             st.markdown("#### Aksi Disarankan")
