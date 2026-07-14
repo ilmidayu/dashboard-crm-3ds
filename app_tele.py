@@ -274,6 +274,9 @@ elif menu == "🚨 Warning Pelanggan":
             else:
                 st.success("Kondisi aman. Tidak ada pelanggan yang memerlukan intervensi mendesak.")
 
+        # --- KODE TAMBAHAN UNTUK FORMAT RUPIAH ---
+        tabel_ringkasan['Total_Belanja'] = tabel_ringkasan['Total_Belanja'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.'))        
+        
         with c2:
             st.markdown("#### Aksi Disarankan")
             if not df_intervensi.empty:
