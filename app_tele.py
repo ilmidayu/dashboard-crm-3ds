@@ -265,7 +265,6 @@ elif menu == "🚨 Warning Pelanggan":
                             sukses = kirim_telegram(pesan)
                             if sukses:
                                 st.success("Notifikasi Telegram berhasil terkirim ke HP!")
-                                st.balloons()
             else:
                 st.success("Kondisi aman. Tidak ada pelanggan yang memerlukan intervensi mendesak.")
 
