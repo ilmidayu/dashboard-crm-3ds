@@ -121,7 +121,7 @@ if menu == "📊 Ringkasan Utama":
     with st.container(border=True):
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("Total Pelanggan", f"{len(df)} PT/CV")
-        col2.metric("Total Pendapatan", f"Rp {df['Monetary'].sum()/1e6:.1f} Juta")
+        col2.metric("Total Pendapatan", f"Rp {df['Monetary'].sum()/1e6:,.1f}".replace(',', '.'))
         col3.metric("Rata-rata Transaksi", f"{df['Frequency'].mean():.1f} Kali")
         col4.metric("Rata-rata Kepuasan", f"{df['SKP'].mean():.2f} / 5.0")
 
